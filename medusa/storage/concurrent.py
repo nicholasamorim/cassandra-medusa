@@ -103,11 +103,12 @@ def __upload_file(connection, src, dest, bucket):
 
 @retry(stop_max_attempt_number=MAX_UPLOAD_RETRIES, wait_fixed=5000)
 def _upload_single_part(connection, src, bucket, object_name):
-    obj = connection.upload_object(
-        str(src),
-        container=bucket,
-        object_name=object_name
-    )
+    with open(str(src), 'rb') as iterator:
+        obj = connection.upload_object_via_stream(
+            iterator,
+            container=bucket,
+            object_name=object_name
+        )
 
     return obj
 
